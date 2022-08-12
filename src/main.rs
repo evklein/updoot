@@ -25,12 +25,12 @@ impl Visualize for MyNodeData {
 async fn main() {
     let lobsters_client = LobstersClient{};
 
-    //let submissions = lobsters_client.build_user_tree().await;
-    //println!("{:?}", submissions);
-    //println!("{:?}", submissions.len());
+    let submissions = lobsters_client.build_user_tree().await;
+    println!("{:?}", submissions);
+    println!("{:?}", submissions.len());
 
-    let mut tree: Tree<MyNodeData> = TreeBuilder::new().with_node_capacity(5).build();
-    let root_id: NodeId = tree.insert(Node::new(MyNodeData(String::from("1"))), AsRoot).unwrap();
+    let mut tree: Tree<MyNodeData> = TreeBuilder::new().with_node_capacity(submissions.len()).build();
+    let root_id: NodeId = tree.insert(Node::new(MyNodeData(String::from("jcs"))), AsRoot).unwrap();
     let child_id: NodeId = tree.insert(Node::new(MyNodeData(String::from("2"))), UnderNode(&root_id)).unwrap();
     tree.insert(Node::new(MyNodeData(String::from("3"))), UnderNode(&root_id)).unwrap();
     tree.insert(Node::new(MyNodeData(String::from("4"))), UnderNode(&child_id)).unwrap();
