@@ -10,5 +10,5 @@ Uses [id-tree](https://github.com/iwburns/id-tree) and [id-tree-layout](https://
 
 ![image](https://user-images.githubusercontent.com/5017975/184385341-ba7bd121-bb21-437e-a24e-7f8845c2a604.png)
 
-Note: There is no publicly available lobste.rs API for a purpose like this, so making even a limited number of requests comes with some difficulties. If you're adapting any code in this repository to do something similar, I don't recommend doing it this way.
+**:warning: Note:** There is no publicly available lobste.rs API for a purpose like this, so making even a limited number of requests comes with some difficulties. If you're adapting any code in this repository to do something similar, I don't recommend doing it this way.
 
