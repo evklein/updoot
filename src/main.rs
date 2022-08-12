@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use updoot::LobstersClient;
 use id_tree::InsertBehavior::{AsRoot, UnderNode};
 use id_tree::{Node, NodeId, Tree, TreeBuilder};
@@ -25,20 +27,29 @@ impl Visualize for MyNodeData {
 async fn main() {
     let lobsters_client = LobstersClient{};
 
-    let submissions = lobsters_client.build_user_tree().await;
-    println!("{:?}", submissions);
-    println!("{:?}", submissions.len());
+    let users_with_children = lobsters_client.build_user_tree().await;
+    let jcs_children = users_with_children.get("jcs").unwrap();
 
-    let mut tree: Tree<MyNodeData> = TreeBuilder::new().with_node_capacity(submissions.len()).build();
-    let root_id: NodeId = tree.insert(Node::new(MyNodeData(String::from("jcs"))), AsRoot).unwrap();
-    let child_id: NodeId = tree.insert(Node::new(MyNodeData(String::from("2"))), UnderNode(&root_id)).unwrap();
-    tree.insert(Node::new(MyNodeData(String::from("3"))), UnderNode(&root_id)).unwrap();
-    tree.insert(Node::new(MyNodeData(String::from("4"))), UnderNode(&child_id)).unwrap();
-    tree.insert(Node::new(MyNodeData(String::from("5"))), UnderNode(&child_id)).unwrap();
+    let mut tree: Tree<MyNodeData> = TreeBuilder::new().with_node_capacity(100).build();
+    let jcs_node_id: NodeId = tree.insert(Node::new(MyNodeData(String::from("jcs"))), AsRoot).unwrap();
+
+    build_tree(&mut tree, &users_with_children, &jcs_node_id, &jcs_children);
 
     // Here comes the visualization part.
     Layouter::new(&tree)
         .with_file_path(std::path::Path::new("test.svg"))
         .write()
         .expect("Failed writing layout")
+}
+
+fn build_tree(tree: &mut Tree<MyNodeData>, tree_map: &HashMap<String, Vec<String>>, parent: &NodeId, children: &Vec<String>) {
+    for child in children {
+        let child_node_id = &tree.insert(
+                                            Node::new(MyNodeData(String::from(child))),
+                                            UnderNode(parent))
+                                        .unwrap();
+        if tree_map.contains_key(child) {
+            build_tree(tree, tree_map, child_node_id, tree_map.get(child).unwrap());
+        }
+    }
 }

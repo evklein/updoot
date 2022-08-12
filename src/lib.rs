@@ -66,13 +66,17 @@ impl LobstersClient {
         let recent_submissions: Vec<UserSubmission> = self.fetch_submissions_on_page(0).await;
 
         let mut users: Vec<Lobster> = Vec::new();
+        let mut limit = 0;
         for submission in recent_submissions {
             users.push(submission.submitter_user.clone());
+            limit += 1;
+            if limit >= 5 { break; }
         }
+
+        println!("{:?}", users);
                                                                    
         for user in users {
             let mut next_lobster = user;
-
             loop {
                 let (key, invited_by) = (&next_lobster.username, &next_lobster.invited_by_user);
                 if user_tree_map.contains_key(invited_by) {
@@ -89,7 +93,7 @@ impl LobstersClient {
                 println!("{}->{}", key, invited_by);
                 if invited_by == "jcs" { break; }
                 next_lobster = self.fetch_lobster(invited_by).await.unwrap();
-                thread::sleep(time::Duration::from_millis(1500));
+                thread::sleep(time::Duration::from_millis(4000));
             }
             println!("----");
         }
