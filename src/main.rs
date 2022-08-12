@@ -1,4 +1,4 @@
-use whats_hot::LobstersClient;
+use updoot::LobstersClient;
 
 //https://github.com/jsinger67/id-tree-layout
 // https://github.com/iwburns/id-tree

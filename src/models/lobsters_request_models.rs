@@ -18,7 +18,7 @@ pub struct Tag {
     category_id: i32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UserSubmission {
     short_id: String,
     short_id_url: String,
@@ -35,14 +35,14 @@ pub struct UserSubmission {
     tags: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Lobster {
     pub username: String,
     pub created_at: String,
     pub is_admin: bool,
     pub about: String,
     pub is_moderator: bool,
-    pub karma: i32,
+    //pub karma: i32,
     pub avatar_url: String,
     pub invited_by_user: String,
 }
