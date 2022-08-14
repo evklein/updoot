@@ -2,7 +2,7 @@ use std::{collections::HashMap};
 
 use std::{thread, time, error::Error};
 use models::lobsters_request_models::{UserSubmission, Tag, Lobster};
-use models::hn_request_models::{HNItem, Story, Comment, HNMasterStruct, Ask, Job, Poll};
+use models::hn_request_models::{HNMasterStruct};
 use reqwest::{self, header::{USER_AGENT}};
 
 pub mod models;
@@ -124,15 +124,17 @@ impl HackerNewsClient {
         let start_index = latest_item_id - number_of_items as i64;
 
         for next_item_id in start_index..latest_item_id {
-            let endpoint = format!("https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty", next_item_id);
-            let next_item = client.get(endpoint).send().await?;
-            let next_item_json = next_item.json::<HNItem>().await?;
-            match next_item_json.item_type.as_str() {
-                "story" => master_list.stories.push(next_item.json::<Story>().await?),
-                "comment" => master_list.comments.push(next_item.json::<Comment>().await?),
-                "ask" => master_list.asks.push(next_item.json::<Ask>().await?),
-                "job" => master_list.jobs.push(next_item.json::<Job>().await?),
-                "poll" => master_list.polls.push(next_item.json::<Poll>().await?),
+            let endpoint = format!("https://hacker-news.firebaseio.com/v0/item/{}.json", next_item_id);
+            let next_item = client.get(endpoint).send().await?.text().await?;
+            let next_item_json: serde_json::Value = serde_json::from_str(next_item.as_str())?;
+
+            println!("Item: {}\n{:?}", next_item_id, next_item.as_str());
+            match next_item_json["type"].as_str() {
+                Some("story") => master_list.stories.push(serde_json::from_str(next_item.as_str())?),
+                Some("comment") => master_list.comments.push(serde_json::from_str(next_item.as_str())?),
+                Some("ask") => master_list.asks.push(serde_json::from_str(next_item.as_str())?),
+                Some("job") => master_list.jobs.push(serde_json::from_str(next_item.as_str())?),
+                Some("poll") => master_list.polls.push(serde_json::from_str(next_item.as_str())?),
                 _ => panic!("Ahhh!!"),
             };
         }
