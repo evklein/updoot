@@ -1,7 +1,8 @@
 use std::{collections::HashMap};
 
-use std::{thread, time};
+use std::{thread, time, error::Error};
 use models::lobsters_request_models::{UserSubmission, Tag, Lobster};
+use models::hn_request_models::{HNItem};
 use reqwest::{self, header::{USER_AGENT}};
 
 pub mod models;
@@ -9,7 +10,6 @@ pub mod models;
 const SPOOFED_USER_AGENT_HEADER: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
 
 pub struct LobstersClient;
-
 
 impl LobstersClient {
     pub async fn fetch_tags_async(&self) -> Vec<Tag> {
@@ -99,5 +99,31 @@ impl LobstersClient {
         }
 
         user_tree_map
+    }
+}
+
+pub struct HackerNewsClient;
+
+impl HackerNewsClient {
+    pub async fn get_latest_item_id(&self) -> Result<i64, Box<dyn Error>> {
+        let client = reqwest::Client::new();
+        let endpoint = String::from("https://hacker-news.firebaseio.com/v0/maxitem.json");
+        let raw_response = client.get(endpoint)
+            .send()
+            .await?;
+        
+        Ok(raw_response.json::<i64>().await.unwrap())
+    }
+
+    pub async fn get_latest_items(&self, number_of_items: i32) -> Result<Vec<HNItem>, Box<dyn Error>> {
+        let client = reqwest::Client::new();
+
+        let mut items: Vec<HNItem> = Vec::new();
+        let latest_item_id = self.get_latest_item_id().await?;
+        let start_index = latest_item_id - number_of_items as i64;
+
+        for i in start_index..latest_item_id {
+
+        }
     }
 }
