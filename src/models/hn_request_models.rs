@@ -1,9 +1,30 @@
+use futures::poll;
 use serde::{Deserialize, Serialize};
+
+pub struct HNMasterStruct {
+    pub stories: Vec<Story>,
+    pub comments: Vec<Comment>,
+    pub asks: Vec<Ask>,
+    pub jobs: Vec<Job>,
+    pub polls: Vec<Poll>,
+}
+
+impl HNMasterStruct {
+    pub fn new() -> HNMasterStruct {
+        HNMasterStruct {
+            stories: Vec::new(),
+            comments: Vec::new(),
+            asks: Vec::new(),
+            jobs: Vec::new(),
+            polls: Vec::new(),
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HNItem {
     #[serde(rename = "type")]
-    item_type: String,
+    pub item_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

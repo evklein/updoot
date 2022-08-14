@@ -2,7 +2,7 @@ use std::{collections::HashMap};
 
 use std::{thread, time, error::Error};
 use models::lobsters_request_models::{UserSubmission, Tag, Lobster};
-use models::hn_request_models::{HNItem};
+use models::hn_request_models::{HNItem, Story, Comment, HNMasterStruct, Ask, Job, Poll};
 use reqwest::{self, header::{USER_AGENT}};
 
 pub mod models;
@@ -115,15 +115,28 @@ impl HackerNewsClient {
         Ok(raw_response.json::<i64>().await.unwrap())
     }
 
-    pub async fn get_latest_items(&self, number_of_items: i32) -> Result<Vec<HNItem>, Box<dyn Error>> {
+    pub async fn get_latest_items(&self, number_of_items: i32) -> Result<HNMasterStruct, Box<dyn Error>> {
         let client = reqwest::Client::new();
 
-        let mut items: Vec<HNItem> = Vec::new();
+        let mut master_list = HNMasterStruct::new();
+
         let latest_item_id = self.get_latest_item_id().await?;
         let start_index = latest_item_id - number_of_items as i64;
 
-        for i in start_index..latest_item_id {
-
+        for next_item_id in start_index..latest_item_id {
+            let endpoint = format!("https://hacker-news.firebaseio.com/v0/item/{}.json?print=pretty", next_item_id);
+            let next_item = client.get(endpoint).send().await?;
+            let next_item_json = next_item.json::<HNItem>().await?;
+            match next_item_json.item_type.as_str() {
+                "story" => master_list.stories.push(next_item.json::<Story>().await?),
+                "comment" => master_list.comments.push(next_item.json::<Comment>().await?),
+                "ask" => master_list.asks.push(next_item.json::<Ask>().await?),
+                "job" => master_list.jobs.push(next_item.json::<Job>().await?),
+                "poll" => master_list.polls.push(next_item.json::<Poll>().await?),
+                _ => panic!("Ahhh!!"),
+            };
         }
+
+        Ok(master_list)
     }
 }
