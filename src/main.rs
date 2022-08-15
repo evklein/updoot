@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
-use yew::prelude::*;
-use ybc::NavbarFixed::Top;
-use ybc::TileCtx::{Ancestor, Child, Parent};
-use ybc::TileSize::Four;
+use updoot::models::hn_request_models::Comment;
 use yew::prelude::*;
 
 use updoot::{LobstersClient, HackerNewsClient};
@@ -17,11 +14,17 @@ use components::hn_comment_component::{HNCommentComponent, self};
 
 #[function_component(App)]
 fn app() -> Html {
-    let comment_props = hn_comment_component::Props {
-        comment: HNCommentComponent {
-    
+    let comment_props = yew::props!(hn_comment_component::Props {
+        comment: Comment {
+            by: "Evan".to_string().to_owned(),
+            kids: Vec::new().to_owned(),
+            id: 1234,
+            parent: 1,
+            text: "Evan's comment".to_owned(),
+            time: 1234,
+            item_type: "comment".to_owned(),
         },
-    };
+    });
     html! {
         <>
         <div class="container">
@@ -36,7 +39,7 @@ fn app() -> Html {
                 {"Generate User Tree"}
             </button>
             <div>
-                {HNCommentComponent prop}
+                <HNCommentComponent ..comment_props />
             </div>
         </div>
         </>

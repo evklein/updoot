@@ -69,28 +69,28 @@ pub struct Story {
     url: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Comment {
     #[serde(default)]
-    by: String,
+    pub by: String,
 
     #[serde(default)]
-    id: i64,
+    pub id: i64,
 
     #[serde(default)]
-    kids: Vec<i64>,
+    pub kids: Vec<i64>,
 
     #[serde(default)]
-    parent: i64,
+    pub parent: i64,
 
     #[serde(default)]
-    text: String,
+    pub text: String,
 
     #[serde(default)]
-    time: u64,
+    pub time: u64,
     
     #[serde(rename = "type")]
-    item_type: String,
+    pub item_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
