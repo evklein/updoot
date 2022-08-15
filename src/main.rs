@@ -1,12 +1,27 @@
 use std::collections::HashMap;
 
+use yew::prelude::*;
+
 use updoot::{LobstersClient, HackerNewsClient};
 use id_tree::InsertBehavior::{AsRoot, UnderNode};
 use id_tree::{Node, NodeId, Tree, TreeBuilder};
 use id_tree_layout::{Layouter, Visualize};
 
-#[tokio::main]
-async fn main() {
+#[function_component(App)]
+fn app() -> Html {
+    html! {
+        <>
+            <h1>{ "Hello World!" }</h1>
+        </>
+    }
+}
+
+fn main() {
+    yew::start_app::<App>();
+}
+
+
+async fn run_hn_100_test() {
     let hn_client = HackerNewsClient {};
     let top_100_hn_items = hn_client.get_latest_items(100).await;
     match top_100_hn_items {
