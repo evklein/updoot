@@ -69,7 +69,7 @@ pub struct Story {
     url: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Comment {
     #[serde(default)]
     by: String,

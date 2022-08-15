@@ -1,17 +1,44 @@
 use std::collections::HashMap;
 
 use yew::prelude::*;
+use ybc::NavbarFixed::Top;
+use ybc::TileCtx::{Ancestor, Child, Parent};
+use ybc::TileSize::Four;
+use yew::prelude::*;
 
 use updoot::{LobstersClient, HackerNewsClient};
 use id_tree::InsertBehavior::{AsRoot, UnderNode};
 use id_tree::{Node, NodeId, Tree, TreeBuilder};
 use id_tree_layout::{Layouter, Visualize};
 
+pub mod components;
+
+use components::hn_comment_component::{HNCommentComponent, self};
+
 #[function_component(App)]
 fn app() -> Html {
+    let comment_props = hn_comment_component::Props {
+        comment: HNCommentComponent {
+    
+        },
+    };
     html! {
         <>
-            <h1>{ "Hello World!" }</h1>
+        <div class="container">
+            <h1 class="title">
+                { "Hello, world!" }
+            </h1>
+            <p class="subtitle">
+                { "My first website with " }
+                <strong>{"Bulma"}</strong>{"!"}
+            </p>
+            <button class="button is-primary">
+                {"Generate User Tree"}
+            </button>
+            <div>
+                {HNCommentComponent prop}
+            </div>
+        </div>
         </>
     }
 }
@@ -42,7 +69,7 @@ impl Visualize for LobsterNode {
     }
 }
 
-async fn do_old_lobsters_tree_buil() {
+async fn do_old_lobsters_tree_build() {
     let lobsters_client = LobstersClient{};
 
     let users_with_children = lobsters_client.build_user_tree().await;
