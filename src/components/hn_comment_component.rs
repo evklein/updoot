@@ -1,5 +1,5 @@
 use updoot::models::hn_request_models::Comment;
-use yew::{Component, Context, html, Html, Properties};
+use yew::{html, Component, Context, Html, Properties};
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
@@ -11,7 +11,7 @@ pub struct HNCommentComponent;
 impl Component for HNCommentComponent {
     type Message = ();
     type Properties = Props;
-    
+
     fn create(_ctx: &Context<Self>) -> Self {
         HNCommentComponent
     }
@@ -21,7 +21,7 @@ impl Component for HNCommentComponent {
             <>
                 <div class="columns">
                     <div class="column">
-                        {&ctx.props().comment.by }{ ":" }{&ctx.props().comment.text}
+                        {&ctx.props().comment.by }{ ": " }{&ctx.props().comment.text}
                     </div>
                 </div>
             </>

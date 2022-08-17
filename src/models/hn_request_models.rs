@@ -21,12 +21,11 @@ impl HNMasterStruct {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct User {
     #[serde(default)]
     about: String,
-    
+
     #[serde(default)]
     created: i64,
 
@@ -44,24 +43,24 @@ pub struct User {
 pub struct Story {
     #[serde(default)]
     by: String,
-    
+
     #[serde(default)]
     descendants: i32,
-    
+
     #[serde(default)]
     id: i64,
-    
+
     #[serde(default)]
     kids: Vec<i64>,
-    
+
     #[serde(default)]
     score: i32,
     #[serde(default)]
     time: u64,
-    
+
     #[serde(default)]
     title: String,
-    
+
     #[serde(rename = "type")]
     item_type: String,
 
@@ -88,7 +87,7 @@ pub struct Comment {
 
     #[serde(default)]
     pub time: u64,
-    
+
     #[serde(rename = "type")]
     pub item_type: String,
 }
@@ -103,19 +102,19 @@ pub struct Ask {
 
     #[serde(default)]
     kids: Vec<i64>,
-    
+
     #[serde(default)]
     score: i32,
-    
+
     #[serde(default)]
     text: String,
-    
+
     #[serde(default)]
     time: i64,
-    
+
     #[serde(default)]
     title: String,
-    
+
     #[serde(rename = "type")]
     item_type: String,
 }
@@ -139,7 +138,7 @@ pub struct Job {
 
     #[serde(default)]
     title: String,
-    
+
     #[serde(rename = "type")]
     item_type: String,
 
@@ -154,28 +153,28 @@ pub struct Poll {
 
     #[serde(default)]
     descendants: i32,
-    
+
     #[serde(default)]
     id: i64,
-    
+
     #[serde(default)]
     kids: Vec<i64>,
 
     #[serde(default)]
     parts: Vec<i64>,
-    
+
     #[serde(default)]
     score: i32,
-    
+
     #[serde(default)]
     text: String,
-    
+
     #[serde(default)]
     time: i64,
-    
+
     #[serde(default)]
     title: String,
-    
+
     #[serde(rename = "type")]
     item_type: String,
 }
