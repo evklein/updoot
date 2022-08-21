@@ -564,12 +564,12 @@ function getImports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper4869 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 312, __wbg_adapter_20);
+    imports.wbg.__wbindgen_closure_wrapper5083 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 335, __wbg_adapter_20);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper8224 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 324, __wbg_adapter_23);
+    imports.wbg.__wbindgen_closure_wrapper8440 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 347, __wbg_adapter_23);
         return addHeapObject(ret);
     };
 
@@ -605,7 +605,7 @@ function initSync(bytes) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('updoot-a89be48c12a70531_bg.wasm', import.meta.url);
+        input = new URL('updoot-a56aef6e683d63f9_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 

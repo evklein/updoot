@@ -12,17 +12,20 @@ use updoot::{HackerNewsClient, LobstersClient};
 pub mod components;
 pub mod routes;
 
+use components::navbar::NavBar;
 use components::hn_comment_component::{HNCommentComponent};
 use routes::Route;
 
 #[function_component(App)]
 fn app() -> Html {
     html! {
+        <>
+        <NavBar />
         <BrowserRouter>
             <Switch<Route> render={Switch::render(switch)} />
         </BrowserRouter>
+        </>
     }
-
 }
 
 fn switch(routes: &Route) -> Html {
