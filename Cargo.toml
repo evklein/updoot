@@ -18,3 +18,5 @@ id_tree_layout = "2.0.3"
 
 wasm-bindgen-futures = "0.4.32"
 yew-hooks = "0.1.56"
+yew-router = "0.16"
+

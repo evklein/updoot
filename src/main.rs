@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use updoot::models::hn_request_models::Comment;
 use yew::prelude::*;
+use yew_router::prelude::*;
 
 use id_tree::InsertBehavior::{AsRoot, UnderNode};
 use id_tree::{Node, NodeId, Tree, TreeBuilder};
@@ -9,11 +10,22 @@ use id_tree_layout::{Layouter, Visualize};
 use updoot::{HackerNewsClient, LobstersClient};
 
 pub mod components;
+pub mod routes;
 
 use components::hn_comment_component::{HNCommentComponent};
+use routes::Route;
 
 #[function_component(App)]
 fn app() -> Html {
+    html! {
+        <BrowserRouter>
+            <Switch<Route> render={Switch::render(switch)} />
+        </BrowserRouter>
+    }
+
+}
+
+fn switch(routes: &Route) -> Html {
     let comment = Comment {
         by: "norvig".to_owned(),
         id: 2921983,
@@ -23,26 +35,18 @@ fn app() -> Html {
         time: 1314211127,
         item_type: "comment".to_owned(),
     };
-
-    html! {
-        <>
-        <div class="container">
-            <h1 class="title">
-                { "Hello, world!" }
-            </h1>
-            <p class="subtitle">
-                { "My first website with " }
-                <strong>{"Bulma"}</strong>{"!"}
-            </p>
-            <button class="button is-primary">
-                {"Generate User Tree"}
-            </button>
+    match routes {
+        Route::Home => html! { <h1>{ "Home" }</h1> },
+        Route::Game => html! {
             <div class="columns">
                 <HNCommentComponent comment={comment.clone()} />
                 <HNCommentComponent comment={comment.clone()} />
             </div>
-        </div>
-        </>
+        },
+        Route::Tree => html! {
+            <></>
+        },
+        Route::NotFound => html! { <h1>{ "404" }</h1> },
     }
 }
 
