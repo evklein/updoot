@@ -1,15 +1,6 @@
-
 use updoot::models::hn_request_models::Comment;
-use updoot::{HackerNewsClient};
-use yew::{html, Component, Context, Html, Properties};
 use yew::prelude::*;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use wasm_bindgen_futures::spawn_local;
-use std::sync::{Arc, Mutex};
-use yew_hooks::prelude::*;
-use yew::html::Scope;
-
-// region
+use yew::{html, Context, Html, Properties};
 
 pub struct HNCommentComponent {
     comment: Comment,
@@ -40,7 +31,7 @@ impl Component for HNCommentComponent {
                 if self.comment.id == new_comment.id {
                     return false;
                 }
-                
+
                 self.comment = new_comment;
                 true
             }
