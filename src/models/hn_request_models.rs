@@ -92,6 +92,12 @@ pub struct Comment {
     pub item_type: String,
 }
 
+impl Comment {
+    pub fn new() -> Comment {
+        Comment { by: String::new(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Ask {
     #[serde(default)]

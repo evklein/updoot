@@ -6,6 +6,7 @@ use reqwest::{self, header::USER_AGENT};
 use std::{error::Error, thread, time};
 
 pub mod models;
+pub mod routes;
 
 const SPOOFED_USER_AGENT_HEADER: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
 

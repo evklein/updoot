@@ -1,7 +1,6 @@
 use updoot::models::hn_request_models::Comment;
 use yew::prelude::*;
 use yew::{html, Context, Html, Properties};
-
 pub struct HNCommentComponent {
     comment: Comment,
 }
@@ -21,7 +20,7 @@ impl Component for HNCommentComponent {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            comment: ctx.props().comment.clone(),
+            comment: ctx.props().comment.to_owned(),
         }
     }
 
@@ -56,9 +55,3 @@ impl Component for HNCommentComponent {
         }
     }
 }
-
-// async fn fetch_number_of_items() -> CommentComponentMessage {
-//     let client = HackerNewsClient {};
-//     let response = client.get_latest_item_id().await;
-//     CommentComponentMessage::NumberChanged(response.unwrap())
-// }

@@ -13,7 +13,7 @@ pub mod components;
 pub mod routes;
 
 use components::navbar::NavBar;
-use components::hn_comment_component::{HNCommentComponent};
+use components::game_component::GameComponent;
 use routes::Route;
 
 #[function_component(App)]
@@ -29,22 +29,10 @@ fn app() -> Html {
 }
 
 fn switch(routes: &Route) -> Html {
-    let comment = Comment {
-        by: "norvig".to_owned(),
-        id: 2921983,
-        kids: Vec::new(),
-        parent: 2921506,
-        text: "Aw shucks, guys ... you make me blush with your compliments.<p>Tell you what, Ill make a deal: I'll keep writing if you keep reading. K?".to_owned(),
-        time: 1314211127,
-        item_type: "comment".to_owned(),
-    };
     match routes {
         Route::Home => html! { <h1>{ "Home" }</h1> },
         Route::Game => html! {
-            <div class="columns">
-                <HNCommentComponent comment={comment.clone()} />
-                <HNCommentComponent comment={comment.clone()} />
-            </div>
+            <GameComponent />
         },
         Route::Tree => html! {
             <></>
