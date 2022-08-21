@@ -12,20 +12,16 @@ use yew::html::Scope;
 // region
 
 pub struct HNCommentComponent {
-    item: i64,
+    comment: Comment,
 }
 
 #[derive(PartialEq, Properties)]
 pub struct CommentComponentProps {
-    pub latest_item: i64,
+    pub comment: Comment,
 }
 
 pub enum CommentComponentMessage {
-    NumberChanged(i64),
-}
-
-impl HNCommentComponent {
-
+    SetComment(Comment),
 }
 
 impl Component for HNCommentComponent {
@@ -34,31 +30,35 @@ impl Component for HNCommentComponent {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            item: ctx.props().latest_item,
+            comment: ctx.props().comment.clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            CommentComponentMessage::NumberChanged(value) => {
-                self.item = value;
+            CommentComponentMessage::SetComment(new_comment) => {
+                if self.comment.id == new_comment.id {
+                    return false;
+                }
+                
+                self.comment = new_comment;
                 true
             }
         }
     }
 
-    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
-        if first_render {
-            ctx.link().send_future(fetch_number_of_items());
-        }
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
-            <div class="columns">
-                <div class="column">
-                    <p>{ self.item }</p>
+            <div class="column">
+                <div class="box">
+                    <div class="comment-text title is-6">
+                        { &self.comment.text }
+                    </div>
+                    <div class="comment-bottom">
+                        <p><i class="fas fa-user"></i>{ " " }{ &self.comment.by }</p>
+                        <p><i class="fas fa-clock"></i>{ " " }{ self.comment.time }</p>
+                    </div>
                 </div>
             </div>
             </>
@@ -66,8 +66,8 @@ impl Component for HNCommentComponent {
     }
 }
 
-async fn fetch_number_of_items() -> CommentComponentMessage {
-    let client = HackerNewsClient {};
-    let response = client.get_latest_item_id().await;
-    CommentComponentMessage::NumberChanged(response.unwrap())
-}
+// async fn fetch_number_of_items() -> CommentComponentMessage {
+//     let client = HackerNewsClient {};
+//     let response = client.get_latest_item_id().await;
+//     CommentComponentMessage::NumberChanged(response.unwrap())
+// }

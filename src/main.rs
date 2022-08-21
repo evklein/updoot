@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use updoot::models::hn_request_models::Comment;
 use yew::prelude::*;
 
 use updoot::{LobstersClient, HackerNewsClient};
@@ -13,6 +14,16 @@ use components::hn_comment_component::{HNCommentComponent, self};
 
 #[function_component(App)]
 fn app() -> Html {
+    let comment = Comment {
+        by: "norvig".to_owned(),
+        id: 2921983,
+        kids: Vec::new(),
+        parent: 2921506,
+        text: "Aw shucks, guys ... you make me blush with your compliments.<p>Tell you what, Ill make a deal: I'll keep writing if you keep reading. K?".to_owned(),
+        time: 1314211127,
+        item_type: "comment".to_owned(),
+    };
+    
     html! {
         <>
         <div class="container">
@@ -26,8 +37,9 @@ fn app() -> Html {
             <button class="button is-primary">
                 {"Generate User Tree"}
             </button>
-            <div>
-                <HNCommentComponent latest_item=10 />
+            <div class="columns">
+                <HNCommentComponent comment={comment.clone()} />
+                <HNCommentComponent comment={comment.clone()} />
             </div>
         </div>
         </>
