@@ -14,7 +14,7 @@ pub enum GameComponentMessage {
     IncrementUserScore,
     IncrementComputerScore,
     RefreshEligibleParents(Vec<Comment>),
-    RefreshChildComments,
+    RefreshChildComments(Comment, Comment),
     CheckWinner,
 }
 
@@ -24,7 +24,7 @@ pub struct GameComponent {
     computer_score: usize,
     eligible_parent_comments: Vec<Comment>,
     current_parent_comment: Comment,
-    //current_child_comments: (Comment, Comment),
+    current_child_comments: (Comment, Comment),
 }
 
 impl Component for GameComponent {
@@ -38,10 +38,11 @@ impl Component for GameComponent {
             computer_score: 0,
             eligible_parent_comments: Vec::new(),
             current_parent_comment: Comment::new(),
+            current_child_comments: (Comment::new(), Comment::new()),
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             GameComponentMessage::IncrementUserScore => {
                 self.user_score += 1;
@@ -62,36 +63,60 @@ impl Component for GameComponent {
                     self.current_parent_comment = Comment { by: "woah!!".to_owned(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
                 }
 
+                ctx.link().send_future(fetch_child_comments());
+                true
+            },
+            GameComponentMessage::RefreshChildComments(comment_a, comment_b) => {
+                self.current_child_comments = (comment_a, comment_b);
                 self.loading_hn_data = false;
                 true
             },
-            GameComponentMessage::RefreshChildComments => true,
             GameComponentMessage::CheckWinner => true,
         }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        if self.loading_hn_data {
-            html! { 
-                <p>
-                    <i class="fas fa-spinner fa-pulse mr-2"></i>
-                    { "Loading game data..." }
-                </p>
-            }
-        } else {
-            html! {
-                <>
-                    <p>{ "Number of items: " }{ self.eligible_parent_comments.len() }</p>
-                    {
-                        if self.current_parent_comment.time != 0 {
-                            html! {
-                                <HNCommentComponent comment={self.current_parent_comment.to_owned()} />
-    
-                            }
-                        } else { html! {}}
+        html! {
+            <div class="m-6">
+                <p class="title is-4">{ "Choose the fake comment to win!" }</p>
+                <hr />
+                <div class="tags has-addons">
+                    <span class="tag is-primary">{ "You: "}{self.user_score}</span>
+                    <span class="tag is-danger">{ "Computer: "}{self.computer_score}</span>
+                </div>
+                {
+                if self.loading_hn_data {
+                    html! { 
+                        <p>
+                            <i class="fas fa-spinner fa-pulse mr-2"></i>
+                            { "Loading game data..." }
+                        </p>
                     }
-                </>
+                } else {
+                    html! {
+                        <>
+                            {
+                                if self.current_parent_comment.time != 0 {
+                                    html! {
+                                        <>
+                                        <HNCommentComponent comment={self.current_parent_comment.clone()} />
+                                        <div class="columns">
+                                            <div class="column">
+                                                <HNCommentComponent comment={self.current_child_comments.0.clone()} />
+                                            </div>
+                                            <div class="column">
+                                                <HNCommentComponent comment={self.current_child_comments.1.clone()} />
+                                            </div>
+                                        </div>
+                                        </>
+                                    }
+                                } else { html! {}}
+                            }
+                        </>
+                    }
+                }
             }
+            </div>
         }
     }
 
@@ -117,4 +142,8 @@ async fn fetch_initial_items() -> GameComponentMessage {
         .collect();
 
     GameComponentMessage::RefreshEligibleParents(eligible_comments)
+}
+
+async fn fetch_child_comments() -> GameComponentMessage {
+    GameComponentMessage::RefreshChildComments(Comment::new(), Comment::new())
 }
