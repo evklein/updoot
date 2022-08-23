@@ -19,6 +19,7 @@ pub enum GameComponentMessage {
 }
 
 pub struct GameComponent {
+    loading_hn_data: bool,
     user_score: usize,
     computer_score: usize,
     eligible_parent_comments: Vec<Comment>,
@@ -32,6 +33,7 @@ impl Component for GameComponent {
 
     fn create(_ctx: &Context<Self>) -> Self {
         GameComponent {
+            loading_hn_data: true,
             user_score: 0,
             computer_score: 0,
             eligible_parent_comments: Vec::new(),
@@ -60,6 +62,7 @@ impl Component for GameComponent {
                     self.current_parent_comment = Comment { by: "woah!!".to_owned(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
                 }
 
+                self.loading_hn_data = false;
                 true
             },
             GameComponentMessage::RefreshChildComments => true,
@@ -68,18 +71,27 @@ impl Component for GameComponent {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        html! {
-            <>
-                <p>{ "Number of items: " }{ self.eligible_parent_comments.len() }</p>
-                {
-                    if self.current_parent_comment.time != 0 {
-                        html! {
-                            <HNCommentComponent comment={self.current_parent_comment.to_owned()} />
-
-                        }
-                    } else { html! {}}
-                }
-            </>
+        if self.loading_hn_data {
+            html! { 
+                <p>
+                    <i class="fas fa-spinner fa-pulse mr-2"></i>
+                    { "Loading game data..." }
+                </p>
+            }
+        } else {
+            html! {
+                <>
+                    <p>{ "Number of items: " }{ self.eligible_parent_comments.len() }</p>
+                    {
+                        if self.current_parent_comment.time != 0 {
+                            html! {
+                                <HNCommentComponent comment={self.current_parent_comment.to_owned()} />
+    
+                            }
+                        } else { html! {}}
+                    }
+                </>
+            }
         }
     }
 
