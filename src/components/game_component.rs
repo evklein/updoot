@@ -1,3 +1,4 @@
+use updoot::GPT3Client;
 use updoot::{models::hn_request_models::Comment, HackerNewsClient};
 use web_sys::HtmlInputElement;
 use yew::{Component, Context, Html, Properties};
@@ -66,7 +67,9 @@ impl Component for GameComponent {
 
                 let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
 
-                ctx.link().send_future(fetch_child_comments(self.current_parent_comment.kids[index_of_child]));
+                let text_prompt = self.current_parent_comment.to_owned().text;
+                let comment_id = self.current_parent_comment.kids[index_of_child];
+                ctx.link().send_future(fetch_child_comments(text_prompt, comment_id));
                 true
             },
             GameComponentMessage::SelectNewParent => {
@@ -81,7 +84,10 @@ impl Component for GameComponent {
                 }
 
                 let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
-                ctx.link().send_future(fetch_child_comments(self.current_parent_comment.kids[index_of_child]));
+
+                let text_prompt = self.current_parent_comment.to_owned().text;
+                let comment_id = self.current_parent_comment.kids[index_of_child];
+                ctx.link().send_future(fetch_child_comments(text_prompt, comment_id));
                 true
             }
             GameComponentMessage::RefreshChildComments(comment_a, comment_b) => {
@@ -162,7 +168,7 @@ async fn fetch_initial_items() -> GameComponentMessage {
     GameComponentMessage::RefreshEligibleParents(eligible_comments)
 }
 
-async fn fetch_child_comments(comment_id: i64) -> GameComponentMessage {
+async fn fetch_child_comments(parent_comment_text: String, comment_id: i64) -> GameComponentMessage {
     // Grab real child comment.
     let client = HackerNewsClient {};
     let response = client.get_comment_by_id(comment_id).await;
@@ -173,6 +179,26 @@ async fn fetch_child_comments(comment_id: i64) -> GameComponentMessage {
     };
 
     // Grab GPT-3 generated comment.
+    let gpt3_client = GPT3Client {};
+    let gpt3_response = gpt3_client.get_language(parent_comment_text).await;
 
-    GameComponentMessage::RefreshChildComments(legit_comment, Comment::new())
+    let fake_comment = match gpt3_response {
+        Ok(res) => Comment {
+            by: legit_comment.by.to_owned(),
+            id: legit_comment.id.to_owned(),
+            kids: Vec::new(),
+            parent: legit_comment.parent.to_owned(),
+            text: res,
+            time: legit_comment.time,
+            item_type: "comment".to_string(),
+        },
+        Err(_) => Comment::new(),
+    };
+
+    let mut rng = rand::thread_rng();
+    if rng.gen_bool(1.0 / 2.0) {
+        GameComponentMessage::RefreshChildComments(legit_comment, fake_comment)
+    } else {
+        GameComponentMessage::RefreshChildComments(fake_comment, legit_comment)
+    }
 }

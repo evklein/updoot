@@ -2,8 +2,10 @@ use std::collections::HashMap;
 
 use models::hn_request_models::{HNMasterStruct, Comment};
 use models::lobsters_request_models::{Lobster, Tag, UserSubmission};
+use models::gpt3_models::*;
 use reqwest::{self, header::USER_AGENT};
 use std::{error::Error, thread, time};
+use rand::Rng;
 
 pub mod models;
 pub mod routes;
@@ -175,5 +177,45 @@ impl HackerNewsClient {
         let raw_response = client.get(endpoint).send().await?;
 
         Ok(raw_response.json::<Comment>().await.unwrap())
+    }
+}
+
+pub struct GPT3Client;
+
+impl GPT3Client {
+    pub async fn get_language(&self, comment: String) -> Result<String, Box<dyn Error>> {
+        let prompt = self.generate_prompt(comment.as_str());
+
+        let client = reqwest::Client::new();
+        let endpoint = String::from("https://api.openai.com/v1/models");
+
+        let data = GPT3RequestModel {
+            model: "text-davinci-002".to_owned(),
+            prompt,
+        };
+
+        let raw_response = client.post(endpoint)
+                                                    .header("Authorization", format!("Bearer {}", api_key))
+                                                    .header("Content-Type", "application/json")
+                                                    .json(&data)
+                                                    .send()
+                                                    .await?;
+        Ok(raw_response.json::<GPT3ResponseModel>().await.unwrap().choices.get(0).unwrap().text.to_owned())
+    }
+
+    fn generate_prompt(&self, comment_to_respond_to: &str) -> String {
+        let additives: [&str; 6] = [
+            "in agreeance with",
+            "in strong opposition opposition to",
+            "hesitantly agreeing with",
+            "responding sarcastically to",
+            "fighting back with firey language against",
+            "suggesting a possible alternative opinion to",
+        ];
+
+        let mut rng = rand::thread_rng();
+        let additive_index = rng.gen_range(0..6);
+
+        format!("A Hacker News comment {} another comment which reads: {}", additives[additive_index], comment_to_respond_to)
     }
 }
