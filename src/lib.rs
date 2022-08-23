@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use models::hn_request_models::HNMasterStruct;
+use models::hn_request_models::{HNMasterStruct, Comment};
 use models::lobsters_request_models::{Lobster, Tag, UserSubmission};
 use reqwest::{self, header::USER_AGENT};
 use std::{error::Error, thread, time};
@@ -167,5 +167,13 @@ impl HackerNewsClient {
         }
 
         Ok(master_list)
+    }
+
+    pub async fn get_comment_by_id(&self, id: i64) -> Result<Comment, Box<dyn Error>>   {
+        let client = reqwest::Client::new();
+        let endpoint = format!("https://hacker-news.firebaseio.com/v0/item/{}.json", id);
+        let raw_response = client.get(endpoint).send().await?;
+
+        Ok(raw_response.json::<Comment>().await.unwrap())
     }
 }

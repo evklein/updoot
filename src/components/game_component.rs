@@ -14,6 +14,7 @@ pub enum GameComponentMessage {
     IncrementUserScore,
     IncrementComputerScore,
     RefreshEligibleParents(Vec<Comment>),
+    SelectNewParent,
     RefreshChildComments(Comment, Comment),
     CheckWinner,
 }
@@ -63,9 +64,26 @@ impl Component for GameComponent {
                     self.current_parent_comment = Comment { by: "woah!!".to_owned(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
                 }
 
-                ctx.link().send_future(fetch_child_comments());
+                let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
+
+                ctx.link().send_future(fetch_child_comments(self.current_parent_comment.kids[index_of_child]));
                 true
             },
+            GameComponentMessage::SelectNewParent => {
+                self.loading_hn_data = true;
+
+                let mut rng = rand::thread_rng();
+                let index_of_parent: usize = rng.gen_range(0..self.eligible_parent_comments.len());
+                if let Some(comment) = self.eligible_parent_comments.get(index_of_parent) {
+                    self.current_parent_comment = comment.to_owned();
+                } else {
+                    self.current_parent_comment = Comment { by: "woah!!".to_owned(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
+                }
+
+                let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
+                ctx.link().send_future(fetch_child_comments(self.current_parent_comment.kids[index_of_child]));
+                true
+            }
             GameComponentMessage::RefreshChildComments(comment_a, comment_b) => {
                 self.current_child_comments = (comment_a, comment_b);
                 self.loading_hn_data = false;
@@ -144,6 +162,17 @@ async fn fetch_initial_items() -> GameComponentMessage {
     GameComponentMessage::RefreshEligibleParents(eligible_comments)
 }
 
-async fn fetch_child_comments() -> GameComponentMessage {
-    GameComponentMessage::RefreshChildComments(Comment::new(), Comment::new())
+async fn fetch_child_comments(comment_id: i64) -> GameComponentMessage {
+    // Grab real child comment.
+    let client = HackerNewsClient {};
+    let response = client.get_comment_by_id(comment_id).await;
+
+    let legit_comment = match response {
+        Ok(res) => res,
+        Err(_) => Comment::new(),
+    };
+
+    // Grab GPT-3 generated comment.
+
+    GameComponentMessage::RefreshChildComments(legit_comment, Comment::new())
 }

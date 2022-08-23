@@ -48,6 +48,7 @@ impl Component for HNCommentComponent {
                     <div class="comment-bottom">
                         <p><i class="fas fa-user"></i>{ " " }{ &self.comment.by }</p>
                         <p><i class="fas fa-clock"></i>{ " " }{ self.comment.time }</p>
+                        <p><i class="fas fa-hashtag"></i>{ " "}{self.comment.id }</p>
                     </div>
                 </div>
             </div>
