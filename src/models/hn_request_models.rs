@@ -90,11 +90,14 @@ pub struct Comment {
 
     #[serde(rename = "type")]
     pub item_type: String,
+
+    #[serde(default)]
+    pub fake: bool,
 }
 
 impl Comment {
     pub fn new() -> Comment {
-        Comment { by: String::new(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
+        Comment { by: String::new(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new(), fake: false, }
     }
 }
 

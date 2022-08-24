@@ -12,8 +12,7 @@ use crate::components::hn_comment_component::HNCommentComponent;
 pub struct GameComponentProps {}
 
 pub enum GameComponentMessage {
-    IncrementUserScore,
-    IncrementComputerScore,
+    CheckRound(bool),
     RefreshEligibleParents(Vec<Comment>),
     SelectNewParent,
     RefreshChildComments(Comment, Comment),
@@ -46,14 +45,30 @@ impl Component for GameComponent {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            GameComponentMessage::IncrementUserScore => {
-                self.user_score += 1;
+            GameComponentMessage::CheckRound(fake) => {
+                self.loading_hn_data = true;
+
+                if fake {
+                    self.user_score += 1;
+                } else {
+                    self.computer_score += 1;
+                }
+
+                let mut rng = rand::thread_rng();
+                let index_of_parent: usize = rng.gen_range(0..self.eligible_parent_comments.len());
+                if let Some(comment) = self.eligible_parent_comments.get(index_of_parent) {
+                    self.current_parent_comment = comment.to_owned();
+                } else {
+                    self.current_parent_comment = Comment::new();
+                }
+
+                let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
+
+                let text_prompt = self.current_parent_comment.to_owned().text;
+                let comment_id = self.current_parent_comment.kids[index_of_child];
+                ctx.link().send_future(fetch_child_comments(text_prompt, comment_id));
                 true
-            }
-            GameComponentMessage::IncrementComputerScore => {
-                self.computer_score += 1;
-                true
-            }
+            },
             GameComponentMessage::RefreshEligibleParents(parent_comments) => {
                 self.eligible_parent_comments = parent_comments;
 
@@ -62,7 +77,7 @@ impl Component for GameComponent {
                 if let Some(comment) = self.eligible_parent_comments.get(index_of_parent) {
                     self.current_parent_comment = comment.to_owned();
                 } else {
-                    self.current_parent_comment = Comment { by: "woah!!".to_owned(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
+                    self.current_parent_comment = Comment::new();
                 }
 
                 let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
@@ -80,7 +95,7 @@ impl Component for GameComponent {
                 if let Some(comment) = self.eligible_parent_comments.get(index_of_parent) {
                     self.current_parent_comment = comment.to_owned();
                 } else {
-                    self.current_parent_comment = Comment { by: "woah!!".to_owned(), id: 0, kids: Vec::new(), parent: 0, text: String::new(), time: 0, item_type: String::new() }
+                    self.current_parent_comment = Comment::new();
                 }
 
                 let index_of_child: usize = rng.gen_range(0..self.current_parent_comment.kids.len());
@@ -99,7 +114,7 @@ impl Component for GameComponent {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <div class="m-6">
                 <p class="title is-4">{ "Choose the fake comment to win!" }</p>
@@ -126,10 +141,49 @@ impl Component for GameComponent {
                                         <HNCommentComponent comment={self.current_parent_comment.clone()} />
                                         <div class="columns">
                                             <div class="column">
-                                                <HNCommentComponent comment={self.current_child_comments.0.clone()} />
+                                                <div class="box">
+                                                    <HNCommentComponent comment={self.current_child_comments.0.clone()} />
+                                                    {
+                                                        if self.current_child_comments.0.fake {
+                                                            html! {
+                                                                <button class="button is-primary" onclick={ctx.link().callback(|_| GameComponentMessage::CheckRound(true))}>
+                                                                    <i class="fas fa-vote-yea mr-2"></i>
+                                                                    { "Choose Comment" }
+                                                                </button>
+                                                            }
+                                                        } else {
+                                                            html! {
+                                                                <button class="button is-primary" onclick={ctx.link().callback(|_| GameComponentMessage::CheckRound(false))}>
+                                                                    <i class="fas fa-vote-yea mr-2"></i>
+                                                                    { "Choose Comment" }
+                                                                </button>
+                                                            }
+                                                        }
+                                                    }
+
+                                                </div>
                                             </div>
                                             <div class="column">
-                                                <HNCommentComponent comment={self.current_child_comments.1.clone()} />
+                                                <div class="box">
+                                                    <HNCommentComponent comment={self.current_child_comments.1.clone()} />
+                                                    {
+                                                        if self.current_child_comments.1.fake {
+                                                            html! {
+                                                                <button class="button is-primary" onclick={ctx.link().callback(|_| GameComponentMessage::CheckRound(true))}>
+                                                                    <i class="fas fa-vote-yea mr-2"></i>
+                                                                    { "Choose Comment" }
+                                                                </button>
+                                                            }
+                                                        } else {
+                                                            html! {
+                                                                <button class="button is-primary" onclick={ctx.link().callback(|_| GameComponentMessage::CheckRound(false))}>
+                                                                    <i class="fas fa-vote-yea mr-2"></i>
+                                                                    { "Choose Comment" }
+                                                                </button>
+                                                            }
+                                                        }
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
                                         </>
@@ -191,6 +245,7 @@ async fn fetch_child_comments(parent_comment_text: String, comment_id: i64) -> G
             text: res,
             time: legit_comment.time,
             item_type: "comment".to_string(),
+            fake: true,
         },
         Err(_) => Comment::new(),
     };

@@ -40,17 +40,13 @@ impl Component for HNCommentComponent {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
-            <div class="column">
-                <div class="box">
-                    <div class="comment-text title is-6">
-                        { &self.comment.text }
-                    </div>
-                    <div class="comment-bottom">
-                        <p><i class="fas fa-user"></i>{ " " }{ &self.comment.by }</p>
-                        <p><i class="fas fa-clock"></i>{ " " }{ self.comment.time }</p>
-                        <p><i class="fas fa-hashtag"></i>{ " "}{self.comment.id }</p>
-                    </div>
-                </div>
+            <div class="comment-text title is-6">
+                { &self.comment.text }
+            </div>
+            <div class="comment-bottom">
+                <p><i class="fas fa-user"></i>{ " " }{ &self.comment.by }</p>
+                <p><i class="fas fa-clock"></i>{ " " }{ self.comment.time }</p>
+                <p><i class="fas fa-hashtag"></i>{ " "}{self.comment.id }</p>
             </div>
             </>
         }
