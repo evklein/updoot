@@ -187,15 +187,18 @@ impl GPT3Client {
         let prompt = self.generate_prompt(comment.as_str());
 
         let client = reqwest::Client::new();
-        let endpoint = String::from("https://api.openai.com/v1/models");
+        let endpoint = String::from("https://api.openai.com/v1/completions");
+        let api_key = String::from("");
 
         let data = GPT3RequestModel {
             model: "text-davinci-002".to_owned(),
             prompt,
+            temperature: 0.7,
+            max_tokens: 700,
         };
 
         let raw_response = client.post(endpoint)
-                                                    .header("Authorization", format!("Bearer {}", api_key))
+                                                    .bearer_auth(api_key)
                                                     .header("Content-Type", "application/json")
                                                     .json(&data)
                                                     .send()
