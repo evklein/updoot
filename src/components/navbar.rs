@@ -26,9 +26,6 @@ pub fn navbar() -> Html {
                 { "Play" }
             </a>
 
-            <a href="/tree" class="navbar-item">
-                { "Tree" }
-            </a>
             </div>
             <div class="navbar-end">
             <a href="https://github.com/evklein/updoot" class="navbar-item title is-5">
